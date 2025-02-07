@@ -1,7 +1,10 @@
 import sqlite3
-import datetime
+from datetime import datetime as datum 
 import random
 import pdb
+
+from login import login, logout
+
 
 connexion = sqlite3.connect('to_do_list.db', autocommit = True)
 cur = connexion.cursor()
@@ -92,24 +95,59 @@ def create():
     res = cur.execute('INSERT INTO mytodos VALUES(?,?,?,?,?,?)',new_todo)
     read()
 
+def createUser():
+    pass
 
-while True:
-    print('Välkommen. 1. Läsa to dos, 2. Lägg till, 3. Uppdatera, 4. Ta bort')
-    action = int(input('Vad vill du göra?: '))
-    if action == 1:
-        read()
-    elif action == 2:
-        create()
-    elif action == 3:
-        update()
-    elif action == 4:
-        delete()
-    elif action == "q":
-        break
-    else:
-        print('No such action, try again')
+def deleteUser():
+    pass
+
+user = login(cur)
 
 
+while user['name'] != '':
+        if user['role']=='admin':
+            print("""Välkommen. 1. Läsa to dos, 2. Lägg till, 3. Uppdatera, 4. Ta bort
+                  5. Skapa användare, 6. Ta bort användare, 7. Logga ut""",)
+            action = int(input('Vad vill du göra?: '))
+            if action == 1:
+                read()
+            elif action == 2:
+                create()
+            elif action == 3:
+                update()
+            elif action == 4:
+                delete()
+            elif action == 5:
+                createUser()
+            elif action == 6:
+                deleteUser()
+            elif action == 7:
+                successfullyOut = logout(cur,user)
+                if successfullyOut:
+                    print(successfullyOut['msg'])
+                    user= {'name':'','role':'','id':''}
+            else:
+                print('No such action, try again')
+
+        elif user['role']=='user':
+            print("""Välkommen. 1. Läsa to dos, 2. Lägg till, 3. Uppdatera, 4. Ta bort
+             5. Logga ut""",)
+            action = int(input('Vad vill du göra?: '))
+            if action == 1:
+                read()
+            elif action == 2:
+                create()
+            elif action == 3:
+                update()
+            elif action == 4:
+                delete()
+            elif action == 5:
+                successfullyOut = logout(cur,user)
+                if successfullyOut:
+                    print(successfullyOut['msg'])
+                    user= {'name':'','role':'','id':''}
+            else:
+                print('No such action, try again')
 
 
 
