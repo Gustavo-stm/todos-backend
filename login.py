@@ -18,8 +18,8 @@ def login(cur):
         try:
             if len(existingUsers)>0:
                 for exUser in existingUsers:
-                    if username and password in exUser:
-                        print('User exists')
+                    if username==exUser[1] and password==exUser[2] in exUser:
+                        pdb.set_trace()
                         user['id'] = int(exUser[0])
                         user['name'] = exUser[1]
                         user['role'] = exUser[5]
