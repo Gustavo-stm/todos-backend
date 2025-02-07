@@ -29,7 +29,7 @@ def login(cur):
         except ValueError:
             print('No such user or wrong password') 
         
-    except SystemError:
+    except:
         print('Not working at the moment. It´s us')
         
     return user
