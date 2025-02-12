@@ -57,8 +57,8 @@ def update():
             option = int(input('Vad vill du uppdatera? 1. Task, 2. Status, 3.Prioritet:' ))
             val = input('Ange ett värde till ditt fält: ')
 
-            if option == 3:
-                val = int(val)
+            # if option == 3:
+            #     val = int(val)
 
             field = ""
 
@@ -67,6 +67,7 @@ def update():
             elif option == 2:
                 field = 'status'
             elif option == 3:
+                val = int(val)
                 field = 'priority'
 
             try:
@@ -104,50 +105,11 @@ def deleteUser():
 user = login(cur)
 
 
-while user['name'] != '':
-        if user['role']=='admin':
-            print("""Välkommen. 1. Läsa to dos, 2. Lägg till, 3. Uppdatera, 4. Ta bort
-                  5. Skapa användare, 6. Ta bort användare, 7. Logga ut""",)
-            action = int(input('Vad vill du göra?: '))
-            if action == 1:
-                read()
-            elif action == 2:
-                create()
-            elif action == 3:
-                update()
-            elif action == 4:
-                delete()
-            elif action == 5:
-                createUser()
-            elif action == 6:
-                deleteUser()
-            elif action == 7:
-                successfullyOut = logout(cur,user)
-                if successfullyOut:
-                    print(successfullyOut['msg'])
-                    user= {'name':'','role':'','id':''}
-            else:
-                print('No such action, try again')
-
-        elif user['role']=='user':
-            print("""Välkommen. 1. Läsa to dos, 2. Lägg till, 3. Uppdatera, 4. Ta bort
-             5. Logga ut""",)
-            action = int(input('Vad vill du göra?: '))
-            if action == 1:
-                read()
-            elif action == 2:
-                create()
-            elif action == 3:
-                update()
-            elif action == 4:
-                delete()
-            elif action == 5:
-                successfullyOut = logout(cur,user)
-                if successfullyOut:
-                    print(successfullyOut['msg'])
-                    user= {'name':'','role':'','id':''}
-            else:
-                print('No such action, try again')
-
-
-
+# while user['name'] != '':
+#     action = int(input('Vad vill du göra?: '))
+#     if user['role']=='admin':
+#         print('Du är admin')
+#         break
+#     elif user['role']=='user':
+#         print('Du är user')
+#         break
