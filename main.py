@@ -1,5 +1,5 @@
 import sqlite3
-from datetime import datetime as datum 
+from datetime import datetime 
 import random
 import pdb
 
@@ -10,13 +10,19 @@ connexion = sqlite3.connect('to_do_list.db', autocommit = True)
 cur = connexion.cursor()
 
 
-def read():
-    res = cur.execute('SELECT * FROM mytodos')
-    [print(i) for i in res]
+def readTodos(user):
+    if user['role']=='admin':
+        res = cur.execute('SELECT * FROM mytodos')
+        [print(i) for i in res]
+    else:
+        res = cur.execute('SELECT todo_id FROM userstodos WHERE user_id = ? ',(int(user['id']),))
+        res = res.fetchall()
+        todos_ids = [x for x in res]
+        [print(todo[0]) for todo in todos_ids]
 
 # -Ta bort to-dos från dbn i programmet
 
-def delete():
+def deleteTodos():
     id = int(input('Vad är id:n du tar bort?: '))
 
     existingTodo = False
@@ -31,7 +37,7 @@ def delete():
     if existingTodo:
         try:
             res = cur.execute('DELETE FROM mytodos WHERE id = ?',(id,))
-            read()
+            # readTodos()
         except:
             print('Server error deleting to do')
 
@@ -73,7 +79,7 @@ def update():
             try:
                 query = f'UPDATE mytodos SET {field} = ? WHERE id = ?'
                 cur.execute(query,(val,id,))
-                read()
+                readTodos()
             except:
                 print('Something went wrong')
         except:
@@ -94,22 +100,89 @@ def create():
     new_todo = (task,status,id,due_date,priority,social)
 
     res = cur.execute('INSERT INTO mytodos VALUES(?,?,?,?,?,?)',new_todo)
-    read()
+    # readTodos()
 
 def createUser():
-    pass
+    id = random.randint(0,10000000)
+    username = input('Enter username: ')
+    password = input('What is password: ')
+
+    if len(username) < 8 or len(password) <8:
+        print('Username or password needs to be 8 chars long')
+        createUser()
+
+    try:
+        role = int(input('Role: 1. Admin, 2. User'))
+
+    except:
+        print('Only numbers please')
+        createUser()
+
+    if role == 1:
+        role = 'admin'
+    elif role == 2:
+        role='user'
+
+    newUser={'id':id, 'username':username, 'password':password,'role':role}
+    try:
+        res = cur.execute('INSERT INTO users (id,name,password,role) VALUES (?,?,?,?)', (newUser['id'], newUser['username'], newUser['password'],newUser['role'],))
+        res = res.fetchall()
+        print(res)
+    except:
+        print('Something wrong with us')
+
+def getUsers():
+
+    allUsers = ""
+    try:
+        allUsers = cur.execute('SELECT * FROM users')
+        allUsers = allUsers.fetchall()
+    except:
+        print('Something went wrong with us')
+
+    return allUsers
+
 
 def deleteUser():
-    pass
+    allUsers = getUsers()
+    [print(user) for user in allUsers]
+
+    id = int(input('What is the id of the user to delete?: '))
+
+    userToDelete = [user for user in allUsers if user[0]==id]
+    
+    if len(userToDelete)>0:
+        res = cur.execute('DELETE FROM users WHERE id = ?',(int(userToDelete[0][0]),))
+        res.fetchall()
+        print(f'User {userToDelete} successfully deleted')
+    else:
+        print('No such user')
+        deleteUser()
+
 
 user = login(cur)
 
+if 'msg' in user.keys():
+    print(user['msg'])
+else:
+    if user['role']=='admin':
+        print("""1. Create user, 2. Delete user
+              3. Read todos, 4. Delete todos  """)
+        action = int(input('Vad vill du göra?: '))
 
-# while user['name'] != '':
-#     action = int(input('Vad vill du göra?: '))
-#     if user['role']=='admin':
-#         print('Du är admin')
-#         break
-#     elif user['role']=='user':
-#         print('Du är user')
-#         break
+        if action==1:
+            createUser()
+        elif action == 2:
+            deleteUser()
+        elif action == 3:
+            readTodos(user)
+        elif action == 4:
+            deleteTodos()
+        
+    elif user['role']=='user':
+        print("""1. Read todos""")
+        action = int(input('Vad vill du göra?: '))
+
+        if action==1:
+            readTodos(user)
+        
